@@ -23,10 +23,19 @@ struct WorthIt_App: App {
         }
     }()
 
+    @AppStorage("hourlyRate") private var hourlyRate: Double = 0
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if hasCompletedOnboarding {
+                HomeView(hourlyRate: hourlyRate)
+                .environment(\.locale, Locale(identifier: "id_ID"))
+            } else {
+                OnBoardingView()
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
+   
+    
 }
