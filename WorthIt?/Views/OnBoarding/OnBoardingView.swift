@@ -8,11 +8,7 @@
 import SwiftUI
 
 struct OnBoardingView: View {
-    @State private var selectedMode: EarningMode = .hourly
-    @State private var earnings: String = ""
-    
-    @AppStorage("hourlyRate") private var hourlyRate: Double = 0
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @StateObject private var onBoardingvm = OnBoardingViewModel()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -27,8 +23,8 @@ struct OnBoardingView: View {
                     .foregroundStyle(.secondary)
             }
             
-            EarningToggle(selected: $selectedMode)
-            EarningsInputField(value: $earnings)
+            EarningToggle(selected: $onBoardingvm.selectedMode)
+            EarningsInputField(value: $onBoardingvm.earnings)
             
             FeatureInfoCard(
                 icon: "chart.line.uptrend.xyaxis",
@@ -41,8 +37,8 @@ struct OnBoardingView: View {
             VStack(spacing: 16) {
                 PrimaryButton(
                     title: "Continue",
-                    action: handleContinue,
-                    isDisabled: earnings.isEmpty
+                    action: onBoardingvm.saveEarnings,
+                    isDisabled: !onBoardingvm.isInputValid
                 )
                 
                 Text("WORTHIT? • VERSION 1.0.2")
@@ -54,13 +50,4 @@ struct OnBoardingView: View {
         .padding(24)
         .background(Color(.systemGray6).ignoresSafeArea())
     }
-    
-    private func handleContinue() {
-        hourlyRate = Double(earnings) ?? 0
-        hasCompletedOnboarding = true  
-    }
-}
-
-#Preview {
-    OnBoardingView()
 }

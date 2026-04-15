@@ -12,7 +12,7 @@ import SwiftData
 struct WorthIt_App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            WishlistItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -29,7 +29,7 @@ struct WorthIt_App: App {
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {
-                HomeView(hourlyRate: hourlyRate)
+                HomeView()
                 .environment(\.locale, Locale(identifier: "id_ID"))
             } else {
                 OnBoardingView()

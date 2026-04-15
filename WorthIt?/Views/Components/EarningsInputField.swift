@@ -38,7 +38,7 @@ struct EarningsInputField: View {
                 ))
                 .font(.system(size: 36, weight: .regular))
                 .foregroundStyle(value.isEmpty ? .secondary : .primary)
-                .keyboardType(.numberPad)
+                .keyboardType(.decimalPad)
                 .focused($isFocused)
             }
             .padding(20)

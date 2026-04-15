@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    var hourlyRate: Double
+    @AppStorage("hourlyRate") private var hourlyRate: Double = 0
 
     @State private var items: [WishlistItem] = [
         WishlistItem(name: "iPhone 15 Pro", price: 999),
@@ -16,13 +16,15 @@ struct HomeView: View {
         WishlistItem(name: "Coffee Grinder", price: 299)
     ]
     @State private var showAddItem = false
+    @AppStorage("earningMode") private var savedMode: String = EarningMode.hourly.rawValue 
+
 
     var body: some View {
         TabView {
             homeTab
                 .tabItem { Label("Home", systemImage: "house.fill") }
 
-            Text("History")
+            HistoryView(items: $items, hourlyRate: hourlyRate, mode: savedMode)
                 .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
 
             NavigationStack {
@@ -43,10 +45,10 @@ extension HomeView {
                     headerSection
                     CurrentGoalCard(
                         goalName: items.first?.name ?? "-",
-                        hoursRemaining: items.first?.hoursNeeded(hourlyRate: hourlyRate) ?? 0,
+                        hoursRemaining: items.first?.hoursNeeded(hourlyRate: hourlyRate, mode: savedMode) ?? 0,
                         progress: 0.65
                     )
-                    HourlyRateCard(hourlyRate: hourlyRate)
+                    HourlyRateCard(hourlyRate: hourlyRate, mode: savedMode)
                     wishlistSection
                 }
                 .padding(20)
@@ -79,9 +81,9 @@ extension HomeView {
     }
 
     var wishlistSection: some View {
-        ForEach($items) { $item in
-            NavigationLink(destination: ItemDetailView(item: item, hourlyRate: hourlyRate)) {
-                WishlistItemRow(item: $item, hourlyRate: hourlyRate)
+        ForEach($items.filter { $0.status.wrappedValue == .wishlist }) { $item in
+            NavigationLink(destination: ItemDetailView(item: $item, hourlyRate: hourlyRate, mode: savedMode)) {
+                WishlistItemRow(item: $item, hourlyRate: hourlyRate, mode: savedMode)
             }
             .buttonStyle(.plain)
         }
@@ -115,5 +117,5 @@ extension HomeView {
 }
 
 #Preview {
-    HomeView(hourlyRate: 26.50)
+    HomeView()
 }
