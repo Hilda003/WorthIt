@@ -6,59 +6,85 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var items: [WishlistItem]
+    
+
+    @AppStorage("isSalaryNet") private var isSalaryNet: Bool = true
+    @AppStorage("hourlyRate") private var hourlyRate: Double = 0
+    @AppStorage("earningMode") private var savedMode: String = EarningMode.hourly.rawValue
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = true
+
     @State private var appearanceDark = false
     @State private var pushNotifications = true
-    
+    @State private var editedSalary: String = ""
+    @State private var selectedMode: EarningMode = .hourly
+    @State private var showEditSalary = false
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                
-                // Title
+
                 Text("Settings")
                     .font(.system(size: 32, weight: .black))
-                
-                // Profile
+
                 UserProfileCard(
                     name: "Alex Harrison",
                     email: "alex.h@design.com"
                 )
-                
+
                 // Calculation Engine
                 SettingsSection(title: "Calculation Engine") {
+
+                    // Edit salary
                     SettingsRow(
-                        icon: "creditcard.fill",
+                        icon: "banknote.fill",
                         iconColor: .blue,
-                        label: "Default Currency"
+                        label: "Your Salary"
                     ) {
                         HStack(spacing: 4) {
-                            Text("USD ($)")
+                            Text(CurrencyFormatter.shared.format(hourlyRate))
                                 .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                             Image(systemName: "chevron.right")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    
+                    .onTapGesture { showEditSalary = true }
                     Divider().padding(.leading, 62)
-                    
+
+                    // Edit mode
+                    SettingsRow(
+                        icon: "calendar.badge.clock",
+                        iconColor: .purple,
+                        label: "Earning Mode"
+                    ) {
+                        Picker("", selection: $savedMode) {
+                            ForEach(EarningMode.allCases, id: \.self) { mode in
+                                Text(mode.rawValue).tag(mode.rawValue)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                    }
+
+                    Divider().padding(.leading, 62)
+
                     SettingsRow(
                         icon: "percent",
                         iconColor: .orange,
-                        label: "Local Tax Rate"
+                        label: "Gaji sudah nett?"
                     ) {
-                        HStack(spacing: 4) {
-                            Text("8.5%")
-                                .foregroundStyle(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+                        Toggle("", isOn: $isSalaryNet)
+                            .labelsHidden()
                     }
                 }
-                
-                // Preferences
+
                 SettingsSection(title: "Preferences") {
                     SettingsRow(
                         icon: "moon.fill",
@@ -68,9 +94,9 @@ struct SettingsView: View {
                         Toggle("", isOn: $appearanceDark)
                             .labelsHidden()
                     }
-                    
+
                     Divider().padding(.leading, 62)
-                    
+
                     SettingsRow(
                         icon: "bell.badge.fill",
                         iconColor: .red,
@@ -80,8 +106,6 @@ struct SettingsView: View {
                             .labelsHidden()
                     }
                 }
-                
-                // Legal & Support
                 SettingsSection(title: "Legal & Support") {
                     SettingsRow(
                         icon: "questionmark.circle.fill",
@@ -91,9 +115,9 @@ struct SettingsView: View {
                         Image(systemName: "arrow.up.right.square")
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     Divider().padding(.leading, 62)
-                    
+
                     SettingsRow(
                         icon: "shield.fill",
                         iconColor: .gray,
@@ -103,9 +127,9 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     Divider().padding(.leading, 62)
-                    
+
                     SettingsRow(
                         icon: "doc.text.fill",
                         iconColor: .gray,
@@ -116,8 +140,6 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                
-                // Danger Zone
                 VStack(alignment: .leading, spacing: 10) {
                     Text("DANGER ZONE")
                         .font(.caption)
@@ -125,14 +147,13 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                         .tracking(1.2)
                         .padding(.horizontal, 4)
-                    
+
                     DangerZoneCard {
-                        // handle delete
+                       
                     }
                 }
-                
-                // Footer version
-                Text("WORTHIT? VERSION 4.2.0 (BUILD 902)")
+
+                Text("WORTHIT? VERSION 1.0.0")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .tracking(1)
@@ -145,14 +166,16 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("WORTHIT?")
-                    .fontWeight(.black)
+                Text("WORTHIT?").fontWeight(.black)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Image(systemName: "person.circle.fill")
                     .font(.title3)
                     .foregroundStyle(.blue)
             }
+        }
+        .sheet(isPresented: $showEditSalary) {
+            EditSalaryView()
         }
     }
 }
