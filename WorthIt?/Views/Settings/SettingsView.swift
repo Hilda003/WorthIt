@@ -149,7 +149,9 @@ struct SettingsView: View {
                         .padding(.horizontal, 4)
 
                     DangerZoneCard {
-                       
+                        clearHistory()
+                    } onDeleteAll: {
+                        deleteAllData()
                     }
                 }
 
@@ -178,7 +180,25 @@ struct SettingsView: View {
             EditSalaryView()
         }
     }
+    private func clearHistory() {
+        let historyItems = items.filter { $0.status != .wishlist }
+        for item in historyItems {
+            modelContext.delete(item)
+        }
+    }
+
+    private func deleteAllData() {
+        for item in items {
+            modelContext.delete(item)
+        }
+        UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
+        UserDefaults.standard.removeObject(forKey: "hourlyRate")
+        UserDefaults.standard.removeObject(forKey: "earningMode")
+        UserDefaults.standard.removeObject(forKey: "isSalaryNet")
+    }
 }
+
+
 
 #Preview {
     NavigationStack {
