@@ -9,11 +9,7 @@
 
 import SwiftUI
 
-enum EarningMode: String, CaseIterable {
-    case hourly = "Hourly"
-    case monthly = "Monthly"
-    
-}
+
 
 struct EarningToggle: View {
     @Binding var selected: EarningMode

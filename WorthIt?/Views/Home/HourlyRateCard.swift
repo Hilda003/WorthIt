@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HourlyRateCard: View {
     var hourlyRate: Double
+    var mode: String = "Hourly"
     
     var formattedRate: String {
         CurrencyFormatter.shared.format(hourlyRate)
@@ -16,7 +17,7 @@ struct HourlyRateCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("HOURLY RATE")
+            Text("\(mode.uppercased()) RATE")
                 .font(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(.white.opacity(0.7))

@@ -10,6 +10,7 @@ import SwiftUI
 struct WishlistItemRow: View {
    @Binding var item: WishlistItem
     var hourlyRate: Double
+    var mode: String = "Hourly"
     
     var body: some View {
         HStack(spacing: 16) {
@@ -30,10 +31,8 @@ struct WishlistItemRow: View {
                         .font(.headline)
                     
                     Spacer()
-                    
-                    // Three dots menu
                     Button {
-                        // action menu
+                       
                     } label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(.secondary)
@@ -44,7 +43,7 @@ struct WishlistItemRow: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 
-                HoursBadge(hours: item.hoursNeeded(hourlyRate: hourlyRate))
+                HoursBadge(hours: item.hoursNeeded(hourlyRate: hourlyRate, mode: mode))
             }
         }
         .padding(16)
